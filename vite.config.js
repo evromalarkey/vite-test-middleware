@@ -8,9 +8,7 @@ const middleware = () => {
             return () => {
                 viteDevServer.middlewares.use(async (req, res, next) => {
                     if (!req.originalUrl.endsWith(".html") && req.originalUrl !== "/") {
-                        req.url = `/templates` + req.originalUrl + ".html";
-                    } else if (req.url === "/index.html") {
-                        req.url = `/templates` + req.url;
+                        req.url = req.originalUrl + ".html";
                     }
 
                     next();
@@ -22,14 +20,19 @@ const middleware = () => {
 
 export default {
     plugins: [middleware()],
-    root: "src",
-    publicDir: "../public",
+    root: "src/templates",
+    publicDir: resolve(process.cwd(), 'public'),
     resolve: {
         alias: {
             '/src': resolve(process.cwd(), 'src')
         }
     },
     build: {
-        outDir: '../dist',
+        outDir: resolve(process.cwd(), 'dist'),
+        rollupOptions: {
+            input: {
+                main: resolve(process.cwd(), 'src/templates/index.html')
+            }
+        }
     }
 }
