@@ -1,5 +1,4 @@
 import {resolve} from "path"
-import liveReload from 'vite-plugin-live-reload'
 
 const middleware = () => {
     return {
@@ -22,7 +21,17 @@ const middleware = () => {
 }
 
 export default {
-    plugins: [middleware(), liveReload('src/templates/*.html', { alwaysReload: true, log: false, root: process.cwd() })],
+    plugins: [middleware(), {
+        name: 'html-reload',
+        handleHotUpdate({ file, server }) {
+            if (file.endsWith('.html')) {
+                server.ws.send({
+                    type: 'full-reload',
+                    path: '*',
+                });
+            }
+        },
+    }],
     server: {
         open: "/"
     },
